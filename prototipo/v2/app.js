@@ -186,6 +186,13 @@
     if (ev.target.id && FIELDS.indexOf(ev.target.id) > -1) readFormIntoState();
   });
 
+  // Incidencia sorpresa: cambiar horario sin perder datos
+  $('btn-change').addEventListener('click', function () {
+    metrics.changes++;
+    showForm('input[name="horario"]:checked');
+    announce('Puedes elegir otro horario. Tus datos se conservaron.');
+  });
+
   $('btn-print').addEventListener('click', function () { window.print(); });
 
   $('btn-new').addEventListener('click', function () {
@@ -218,6 +225,7 @@
     $('o-errors').textContent = metrics.errors;
     $('o-tabs').textContent = metrics.tabs;
     $('o-mouse').textContent = metrics.mouse;
+    $('o-changes').textContent = metrics.changes;
   }
   setInterval(function () { if (!$('observer').hidden) renderMetrics(); }, 200);
 
