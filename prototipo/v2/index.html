@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Reserva de tutoría · UTA · Prototipo v2</title>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <a class="skip" href="#main">Saltar al contenido</a>
+
+  <header class="top">
+    <h1>Reserva de tutoría</h1>
+    <p class="sub">Universidad Técnica de Ambato · FISEI</p>
+  </header>
+
+  <main id="main" tabindex="-1">
+    <ol class="steps" aria-label="Pasos">
+      <li id="st-1" aria-current="step">1. Tus datos y horario</li>
+      <li id="st-2">2. Comprobante</li>
+    </ol>
+
+    <div id="status" class="sr-only" role="status" aria-live="polite"></div>
+
+    <!-- PANTALLA 1: formulario -->
+    <section id="screen-form" aria-labelledby="h-form">
+      <h2 id="h-form" tabindex="-1">Completa tu reserva</h2>
+      <p class="hint">Usa <kbd>Tab</kbd> para avanzar. Los campos con * son obligatorios.</p>
+
+      <div id="errors" class="error-summary" role="alert" hidden></div>
+
+      <form id="form" novalidate>
+        <div class="field">
+          <label for="nombre">Nombre completo *</label>
+          <input id="nombre" name="nombre" type="text" autocomplete="name" required aria-describedby="nombre-err">
+          <p class="err" id="nombre-err" hidden></p>
+        </div>
+
+        <div class="field">
+          <label for="correo">Correo institucional *</label>
+          <span class="hint" id="correo-hint">Ejemplo: usuario@uta.edu.ec</span>
+          <input id="correo" name="correo" type="email" autocomplete="email" required aria-describedby="correo-hint correo-err">
+          <p class="err" id="correo-err" hidden></p>
+        </div>
+
+        <div class="field">
+          <label for="materia">Materia *</label>
+          <select id="materia" name="materia" required aria-describedby="materia-err">
+            <option value="">Selecciona una materia</option>
+            <option>Matemática I</option>
+            <option>Programación I</option>
+            <option>Física</option>
+            <option>Comunicación</option>
+          </select>
+          <p class="err" id="materia-err" hidden></p>
+        </div>
+
+        <div class="field">
+          <label for="tutor">Tutor *</label>
+          <select id="tutor" name="tutor" required aria-describedby="tutor-err">
+            <option value="">Selecciona un tutor</option>
+            <option>Ing. Andrade</option>
+            <option>Ing. Morales</option>
+            <option>Ing. Salazar</option>
+          </select>
+          <p class="err" id="tutor-err" hidden></p>
+        </div>
+
+        <fieldset id="horarios" aria-describedby="horario-hint horario-err">
+          <legend>Horario disponible *</legend>
+          <span class="hint" id="horario-hint">Usa las flechas para moverte y <kbd>Espacio</kbd> para elegir.</span>
+          <div class="slots" id="slots"></div>
+          <p class="err" id="horario-err" hidden></p>
+        </fieldset>
+
+        <p class="selected-line" id="selected-line" aria-live="polite">Horario elegido: <strong id="selected-text">ninguno</strong></p>
+
+        <div class="actions">
+          <button type="submit" class="primary" id="btn-confirm">Confirmar reserva</button>
+          <button type="button" id="btn-clear">Borrar formulario</button>
+        </div>
+      </form>
+    </section>
+
+    <!-- PANTALLA 2: comprobante -->
+    <section id="screen-receipt" aria-labelledby="h-receipt" hidden>
+      <h2 id="h-receipt" tabindex="-1">Reserva confirmada</h2>
+      <div class="receipt" id="receipt">
+        <dl>
+          <dt>Código</dt><dd id="r-code"></dd>
+          <dt>Estudiante</dt><dd id="r-nombre"></dd>
+          <dt>Correo</dt><dd id="r-correo"></dd>
+          <dt>Materia</dt><dd id="r-materia"></dd>
+          <dt>Tutor</dt><dd id="r-tutor"></dd>
+          <dt>Horario</dt><dd id="r-horario"></dd>
+          <dt>Emitido</dt><dd id="r-fecha"></dd>
+        </dl>
+      </div>
+      <div class="actions">
+        <button type="button" class="primary" id="btn-change">Cambiar horario</button>
+        <button type="button" id="btn-print">Imprimir comprobante</button>
+        <button type="button" id="btn-new">Nueva reserva</button>
+      </div>
+      <p class="hint">Al cambiar horario conservamos tus datos; solo eliges otro horario.</p>
+    </section>
+  </main>
+
+  <!-- Panel del observador (Alt+M) -->
+  <aside id="observer" class="observer" hidden aria-label="Panel de medición del observador">
+    <h2>Medición (observador)</h2>
+    <p>Tiempo: <strong id="o-time">0.0 s</strong></p>
+    <p>Errores de validación: <strong id="o-errors">0</strong></p>
+    <p>Pulsaciones de <kbd>Tab</kbd>: <strong id="o-tabs">0</strong></p>
+    <p>Clics de ratón: <strong id="o-mouse">0</strong></p>
+    <p>Cambios de horario: <strong id="o-changes">0</strong></p>
+    <button type="button" id="o-reset">Reiniciar medición</button>
+  </aside>
+
+  <script src="app.js"></script>
+</body>
+</html>
