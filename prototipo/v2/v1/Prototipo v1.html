@@ -1,0 +1,187 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Reserva de tutorías · Prototipo v1</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Atkinson+Hyperlegible:wght@400;700&display=swap">
+<style>
+:root{--ink:#17212B;--muted:#46535F;--paper:#F3F6F9;--card:#fff;--line:#9AA7B3;--brand:#0A4F7A;--brand-d:#073A5A;--focus:#FFC400;--err:#9E1F10;--errbg:#FDECEA;--ok:#17603A;--okbg:#E6F4EC}
+*{box-sizing:border-box}
+body{margin:0;font:1.125rem/1.6 "Atkinson Hyperlegible",Verdana,system-ui,sans-serif;color:var(--ink);background:var(--paper)}
+header{background:var(--brand-d);color:#fff;padding:1rem 1.25rem}
+header p{margin:0;font-weight:700}
+main{max-width:46rem;margin:0 auto;padding:1.5rem 1.25rem 4rem}
+h1{font-size:1.9rem;line-height:1.2;margin:.5rem 0 1rem}
+h1:focus{outline:none}
+.card{background:var(--card);border:2px solid var(--line);border-radius:10px;padding:1.5rem}
+a,button,input,select{font:inherit}
+:focus-visible{outline:4px solid var(--ink);outline-offset:3px;box-shadow:0 0 0 8px var(--focus)}
+.skip{position:absolute;left:-999px;top:.5rem;background:#fff;padding:.75rem 1rem;border-radius:6px}
+.skip:focus{left:.5rem;z-index:10}
+.btn{display:inline-block;min-height:3.25rem;padding:.7rem 1.4rem;border-radius:8px;border:2px solid var(--brand-d);background:var(--brand);color:#fff;font-weight:700;cursor:pointer;text-decoration:none}
+.btn.sec{background:#fff;color:var(--brand-d)}
+.btn:hover{background:var(--brand-d);color:#fff}
+.field{margin:0 0 1.25rem}
+label,legend{display:block;font-weight:700;margin-bottom:.35rem}
+input[type=text],input[type=email],select{width:100%;min-height:3.25rem;padding:.6rem .8rem;border:2px solid var(--muted);border-radius:8px;background:#fff;color:var(--ink)}
+.hint{color:var(--muted);font-size:1rem;margin:0 0 .4rem}
+.msg{color:var(--err);font-weight:700;margin:.35rem 0 0}
+[aria-invalid=true]{border-color:var(--err)!important;background:var(--errbg)}
+fieldset{border:0;padding:0;margin:0 0 1.5rem}
+.slots{display:grid;gap:.6rem;grid-template-columns:repeat(auto-fit,minmax(15rem,1fr))}
+.slot{display:flex;align-items:center;gap:.7rem;min-height:3.25rem;padding:.6rem .9rem;border:2px solid var(--muted);border-radius:8px;background:#fff;cursor:pointer;font-weight:400;margin:0}
+.slot input{width:1.4rem;height:1.4rem;accent-color:var(--brand)}
+.slot:has(input:checked){border-color:var(--brand-d);background:#E3EEF6;font-weight:700}
+.slot:has(input:focus-visible){outline:4px solid var(--ink);outline-offset:3px;box-shadow:0 0 0 8px var(--focus)}
+.alert{background:var(--errbg);border:3px solid var(--err);border-radius:10px;padding:1rem 1.25rem;margin-bottom:1.5rem}
+.alert h2{margin:0 0 .5rem;font-size:1.2rem;color:var(--err)}
+.alert a{color:var(--err);font-weight:700}
+.ok{background:var(--okbg);border:3px solid var(--ok);border-radius:10px;padding:1rem 1.25rem;margin-bottom:1.25rem;font-weight:700;color:var(--ok)}
+dl{display:grid;grid-template-columns:max-content 1fr;gap:.5rem 1.25rem;margin:0 0 1.5rem}
+dt{font-weight:700}dd{margin:0}
+.keys{margin-top:1.5rem;color:var(--muted);font-size:1rem}
+kbd{border:1px solid var(--muted);border-bottom-width:3px;border-radius:5px;padding:0 .4rem;background:#fff}
+.actions{display:flex;gap:1rem;flex-wrap:wrap}
+@media print{header,.actions,.keys,.skip{display:none}}
+@media (prefers-reduced-motion:no-preference){.card{transition:none}}
+</style>
+</head>
+<body>
+<a class="skip" href="#principal">Saltar al contenido</a>
+<header><p>Tutorías universitarias · UTA FISEI</p></header>
+<main id="principal">
+
+<!-- Pantalla 1: Inicio -->
+<section id="v-inicio" class="card">
+  <h1 tabindex="-1">Reserva tu tutoría</h1>
+  <p>En tres pasos: escribe tus datos, elige un horario y recibe tu comprobante. Todo se puede hacer con el teclado.</p>
+  <p class="actions"><button class="btn" type="button" id="btn-empezar">Empezar reserva</button></p>
+  <p class="keys"><kbd>Tab</kbd> avanza · <kbd>Shift</kbd>+<kbd>Tab</kbd> retrocede · <kbd>↑</kbd><kbd>↓</kbd> cambia de horario · <kbd>Enter</kbd> pulsa un botón</p>
+</section>
+
+<!-- Pantallas 2 y 3: Formulario (con error recuperable) -->
+<section id="v-form" class="card" hidden>
+  <h1 tabindex="-1">Datos y horario</h1>
+  <div id="alerta" class="alert" role="alert" tabindex="-1" hidden></div>
+  <form id="form" novalidate>
+    <div class="field"><label for="nombre">Nombre completo</label>
+      <input type="text" id="nombre" name="nombre" autocomplete="name"></div>
+    <div class="field"><label for="cedula">Cédula</label>
+      <p class="hint" id="h-cedula">10 números, sin guiones ni espacios.</p>
+      <input type="text" id="cedula" name="cedula" inputmode="numeric" maxlength="10" aria-describedby="h-cedula"></div>
+    <div class="field"><label for="correo">Correo institucional</label>
+      <input type="email" id="correo" name="correo" autocomplete="email"></div>
+    <div class="field"><label for="materia">Materia</label>
+      <select id="materia" name="materia">
+        <option value="">Elige una materia</option>
+        <option>Matemática</option><option>Programación</option><option>Física</option><option>Comunicación</option>
+      </select></div>
+    <fieldset id="fs-horario"><legend>Horario de tutoría</legend>
+      <p class="hint">Usa las flechas ↑ ↓ para moverte entre horarios.</p>
+      <div class="slots" id="slots"></div></fieldset>
+    <div class="actions">
+      <button class="btn" type="submit">Confirmar tutoría</button>
+      <button class="btn sec" type="button" id="btn-volver">Cancelar reserva</button>
+    </div>
+    <p id="carga" class="hint" role="status" aria-live="polite"></p>
+  </form>
+</section>
+
+<!-- Pantalla 4: Comprobante -->
+<section id="v-comp" class="card" hidden>
+  <h1 tabindex="-1">Tutoría confirmada</h1>
+  <p class="ok">Tu reserva quedó registrada. Guarda este comprobante.</p>
+  <dl id="comp"></dl>
+  <div class="actions">
+    <button class="btn" type="button" id="btn-imprimir">Imprimir comprobante</button>
+    <button class="btn sec" type="button" id="btn-nueva">Hacer otra reserva</button>
+  </div>
+</section>
+
+</main>
+<script>
+const HORARIOS=["Lunes 2 de noviembre · 10:00","Lunes 2 de noviembre · 15:00","Martes 3 de noviembre · 09:00","Miércoles 4 de noviembre · 11:00","Jueves 5 de noviembre · 14:00","Viernes 6 de noviembre · 08:00"];
+// ÚNICA fuente de verdad: el horario y los datos viven aquí y nunca se borran al confirmar.
+const estado={nombre:"",cedula:"",correo:"",materia:"",horario:""};
+const $=id=>document.getElementById(id);
+const vistas=["v-inicio","v-form","v-comp"];
+
+function mostrar(id){
+  vistas.forEach(v=>$(v).hidden=(v!==id));
+  $(id).querySelector("h1").focus();           // el lector y el teclado empiezan en el título nuevo
+  window.scrollTo(0,0);
+}
+function pintarHorarios(){
+  $("slots").innerHTML=HORARIOS.map((h,i)=>
+    `<label class="slot"><input type="radio" name="horario" value="${h}" ${estado.horario===h?"checked":""}> ${h}</label>`).join("");
+}
+function pintarCampos(){
+  ["nombre","cedula","correo","materia"].forEach(k=>$(k).value=estado[k]);
+  pintarHorarios();
+}
+// Guardar cada cambio al instante
+$("form").addEventListener("input",e=>{
+  if(e.target.name==="horario")estado.horario=e.target.value;
+  else if(e.target.name in estado)estado[e.target.name]=e.target.value.trim();
+  e.target.removeAttribute("aria-invalid");
+});
+
+function validar(){
+  const e=[];
+  if(!estado.nombre)e.push(["nombre","Escribe tu nombre completo."]);
+  if(!/^\d{10}$/.test(estado.cedula))e.push(["cedula","La cédula debe tener 10 números."]);
+  if(!/^\S+@\S+\.\S+$/.test(estado.correo))e.push(["correo","Escribe un correo válido, por ejemplo nombre@uta.edu.ec."]);
+  if(!estado.materia)e.push(["materia","Elige una materia."]);
+  if(!estado.horario)e.push(["slots","Elige un horario de tutoría."]);
+  return e;
+}
+function limpiarErrores(){
+  $("alerta").hidden=true;
+  document.querySelectorAll(".msg").forEach(m=>m.remove());
+  document.querySelectorAll("[aria-invalid]").forEach(x=>x.removeAttribute("aria-invalid"));
+}
+$("form").addEventListener("submit",ev=>{
+  ev.preventDefault();
+  limpiarErrores();
+  const errores=validar();
+  if(errores.length){
+    // Pantalla 3: error recuperable. Se vuelve a pintar TODO desde `estado`, así el horario sigue marcado.
+    pintarCampos();
+    errores.forEach(([id,txt])=>{
+      const c=$(id);
+      if(id!=="slots")c.setAttribute("aria-invalid","true");
+      const p=document.createElement("p");p.className="msg";p.textContent=txt;
+      (id==="slots"?$("fs-horario"):c.parentElement).appendChild(p);
+    });
+    $("alerta").innerHTML=`<h2>Revisa ${errores.length} ${errores.length>1?"campos":"campo"} antes de confirmar</h2><ul>`+
+      errores.map(([id,t])=>`<li><a href="#${id}" data-ir="${id}">${t}</a></li>`).join("")+`</ul>`+
+      (estado.horario?`<p>Tu horario sigue elegido: <strong>${estado.horario}</strong>.</p>`:"");
+    $("alerta").hidden=false;$("alerta").focus();
+    return;
+  }
+  // Estado de carga: botón bloqueado y mensaje anunciado; los datos siguen en `estado`
+  const btn=ev.submitter||$("form").querySelector("[type=submit]");
+  btn.disabled=true;btn.textContent="Confirmando…";$("carga").textContent="Confirmando tu tutoría, espera un momento.";
+  setTimeout(()=>{
+    const cod="TUT-"+Date.now().toString(36).toUpperCase().slice(-6);
+    $("comp").innerHTML=`<dt>Código</dt><dd>${cod}</dd><dt>Estudiante</dt><dd>${estado.nombre}</dd><dt>Cédula</dt><dd>${estado.cedula}</dd>
+      <dt>Correo</dt><dd>${estado.correo}</dd><dt>Materia</dt><dd>${estado.materia}</dd><dt>Horario</dt><dd>${estado.horario}</dd>`;
+    btn.disabled=false;btn.textContent="Confirmar tutoría";$("carga").textContent="";
+    mostrar("v-comp");
+  },1200);
+});
+// Los enlaces del resumen de errores llevan el foco al campo (sin ratón)
+$("alerta").addEventListener("click",e=>{
+  const a=e.target.closest("[data-ir]");if(!a)return;e.preventDefault();
+  const id=a.dataset.ir;
+  (id==="slots"?document.querySelector('input[name=horario]'):$(id)).focus();
+});
+$("btn-empezar").onclick=()=>{pintarCampos();mostrar("v-form")};
+$("btn-volver").onclick=()=>{Object.keys(estado).forEach(k=>estado[k]="");limpiarErrores();pintarCampos();mostrar("v-inicio")};
+$("btn-imprimir").onclick=()=>window.print();
+$("btn-nueva").onclick=()=>{Object.keys(estado).forEach(k=>estado[k]="");limpiarErrores();pintarCampos();mostrar("v-form")};
+pintarCampos();
+</script>
+</body>
+</html>
